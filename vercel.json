@@ -1,15 +1,5 @@
 {
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "npm --prefix frontend install",
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "destination": "https://dental-ujqk.onrender.com/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  "installCommand": "npm --prefix frontend install"
 }
