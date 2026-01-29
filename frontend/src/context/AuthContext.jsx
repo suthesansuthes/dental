@@ -3,6 +3,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { checkBackendHealth } from '../services/health';
 
+const API_URL = 'https://dental-ujqk.onrender.com/api';
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -37,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
       if (token) {
         try {
-          const { data } = await axios.get('/api/auth/me');
+          const { data } = await axios.get(`${API_URL}/auth/me`);
           setUser(data.data.user);
         } catch (error) {
           console.error('❌ Failed to load user:', error.message);
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const { data } = await axios.post('/api/auth/register', userData);
+      const { data } = await axios.post(`${API_URL}/auth/register`, userData);
       const { user, token } = data.data;
       
       localStorage.setItem('token', token);
@@ -90,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const { data } = await axios.post('/api/auth/login', credentials);
+      const { data } = await axios.post(`${API_URL}/auth/login`, credentials);
       const { user, token } = data.data;
       
       localStorage.setItem('token', token);
@@ -126,7 +128,7 @@ export const AuthProvider = ({ children }) => {
 
   const adminLogin = async (credentials) => {
     try {
-      const { data } = await axios.post('/api/auth/admin/login', credentials);
+      const { data } = await axios.post(`${API_URL}/auth/admin/login`, credentials);
       const { user, token } = data.data;
       
       localStorage.setItem('token', token);
@@ -152,7 +154,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     try {
-      const { data } = await axios.put('/api/auth/profile', profileData);
+      const { data } = await axios.put(`${API_URL}/auth/profile`, profileData);
       setUser(data.data.user);
       toast.success('Profile updated successfully!');
       return { success: true };
