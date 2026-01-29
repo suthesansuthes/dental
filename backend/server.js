@@ -25,10 +25,35 @@ const app = express();
 connectDB();
 
 // Middleware
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'http://localhost:3000', // Local development
+  'http://localhost:5173', // Vite dev server
+];
+
+// Allow any Vercel deployment URL
+if (process.env.VERCEL_URL) {
+  allowedOrigins.push(`https://${process.env.VERCEL_URL}`);
+}
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      // In production, allow more permissive CORS for frontend deployments
+      if (process.env.NODE_ENV === 'production') {
+        callback(null, true); // Allow all in production
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  },
   credentials: true,
-}));
+}));;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
