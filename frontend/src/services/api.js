@@ -2,6 +2,36 @@ import axios from 'axios';
 
 const API_URL = 'https://dental-ujqk.onrender.com/api';
 
+// Add request interceptor for debugging
+axios.interceptors.request.use(
+  (config) => {
+    console.log(`📤 ${config.method.toUpperCase()} ${config.url}`);
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for error handling
+axios.interceptors.response.use(
+  (response) => {
+    console.log(`📥 ${response.status} ${response.config.url}`);
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      console.error(`❌ ${error.response.status} ${error.config.url}`, error.response.data);
+    } else if (error.request) {
+      console.error('❌ No response received:', error.request);
+    } else {
+      console.error('❌ Error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Doctor API
 export const doctorAPI = {
   getAll: async (params = {}) => {

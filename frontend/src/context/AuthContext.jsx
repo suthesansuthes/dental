@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { checkBackendHealth } from '../services/health';
 
 const AuthContext = createContext();
 
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
+  const [backendHealthy, setBackendHealthy] = useState(true);
 
   // Configure axios defaults
   useEffect(() => {
@@ -26,16 +28,22 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // Load user on mount
+  // Check backend health and load user on mount
   useEffect(() => {
     const loadUser = async () => {
+      // Check backend health first
+      const healthy = await checkBackendHealth();
+      setBackendHealthy(healthy);
+
       if (token) {
         try {
           const { data } = await axios.get('/api/auth/me');
           setUser(data.data.user);
         } catch (error) {
-          console.error('Failed to load user:', error);
-          logout();
+          console.error('❌ Failed to load user:', error.message);
+          if (error.response?.status === 401) {
+            logout();
+          }
         }
       }
       setLoading(false);
@@ -159,6 +167,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     loading,
+    backendHealthy,
     register,
     login,
     adminLogin,
